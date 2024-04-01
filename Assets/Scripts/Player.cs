@@ -8,24 +8,32 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float moveSpeed;
 
+    [SerializeField]
+    private GameObject weapon; // Prefab 쓰기 위해 GameObj 객체 선언, 여기에 Weapon Prefab 넣는다.
+
+    [SerializeField]
+    private Transform shootTransform; // Player 하위 ShootTransform Obj(총알이 나가는 오브젝트) 넣는다. 위치값만 필요해서 Transform으로 선언.
+
+    [SerializeField]
+    private float shootInterval;
+    private float lastShotTime = 0f;
+
     void Update()
     {
-        // 아래의 코드는 마우스가 아닌 키보드로 캐릭터를 조종할때 예시입니다.
-        // collider 컴포넌트를 캐릭터에 추가해 줘야 하며 화면 밖에 collider wall 컴포넌트를 추가해서 캐릭터가 화면 밖을 벗어나지 않도록 해줘야 합니다.
-        // float horizontalInpout = Input.GetAxisRaw("Horizontal");
-        // float verticalInput = Input.GetAxisRaw("Vertical");
-        // Vector3 moveTo = new Vector3(horizontalInpout, 0f, 0f);
-        // transform.position += moveTo * moveSpeed * Time.deltaTime;
-
-        // Vector3 moveTo = new Vector3(moveSpeed * Time.deltaTime, 0f, 0f);
-        // if (Input.GetKey(KeyCode.LeftArrow)) {
-        //     transform.position -= moveTo;
-        // } else if (Input.GetKey(KeyCode.RightArrow)) {
-        //     transform.position += moveTo;
-        // }
-
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         float toX = Mathf.Clamp(mousePos.x, -2.35f, 2.35f); // 마우스 포지션의 위치인데 절댓값 2.35를 넘지 않는 변수를 할당하고 이걸 넣어줄거임
         transform.position = new Vector3(toX, transform.position.y, transform.position.z);
+
+        Shoot();
+
     }
+
+    void Shoot() {
+        // Time.time 은 게임이 시작되고 현재까지 흐른 시간
+        if (Time.time - lastShotTime > shootInterval) {
+            Instantiate(weapon, shootTransform.position, Quaternion.identity);
+            lastShotTime = Time.time;
+        }
+    }
+    
 }
